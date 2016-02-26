@@ -3,7 +3,7 @@ using System;
 namespace GraphQL.Types
 {
     public class ListGraphType<T> : ListGraphType
-        where T : GraphType, new()
+        where T : GraphType
     {
         public ListGraphType()
             : base(typeof(T))
@@ -24,7 +24,7 @@ namespace GraphQL.Types
         {
             var innerType = context.ResolveType(Type);
             var name = innerType.CollectTypes(context);
-            context.AddType(name, innerType);
+            context.AddType(name, innerType, context);
             return "[{0}]".ToFormat(name);
         }
     }

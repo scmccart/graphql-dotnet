@@ -8,9 +8,10 @@ namespace GraphQL
 {
     public static class EnumerableExtensions
     {
-        public static IEnumerable Map(this IEnumerable items, Func<object, object> map)
+        public static IEnumerable<object> Map(this IEnumerable items, Func<object, object> map)
         {
-            return from object item in items select map(item);
+            var mappedItems = from object item in items select map(item);
+            return mappedItems.ToList();
         }
 
         public static async Task<IEnumerable> MapAsync(this IEnumerable items, Func<object, Task<object>> map)
@@ -46,6 +47,23 @@ namespace GraphQL
             var keyValuePairs = await Task.WhenAll(tasks);
 
             return keyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+
+        public static bool Any<T>(this IEnumerable<T> items, Func<T, bool> check)
+        {
+            var result = false;
+
+            foreach (var item in items)
+            {
+                result |= check(item);
+
+                if (result)
+                {
+                    break;
+                }
+            }
+
+            return result;
         }
 
         public static bool Any(this IEnumerable items, Func<object, bool> check)

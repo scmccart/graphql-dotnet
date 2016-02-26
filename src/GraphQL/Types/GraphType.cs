@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using GraphQL.Builders;
 
 namespace GraphQL.Types
 {
@@ -22,7 +22,24 @@ namespace GraphQL.Types
             }
         }
 
-        public void Field<TType>(
+        public FieldBuilder<TGraphType, object, TGraphType> Field<TGraphType>()
+            where TGraphType : GraphType
+        {
+            var builder = FieldBuilder.Create<TGraphType>();
+            _fields.Add(builder.FieldType);
+            return builder;
+        }
+
+        public ConnectionBuilder<TParentType, TGraphType, object> Connection<TParentType, TGraphType>()
+            where TParentType : GraphType
+            where TGraphType : ObjectGraphType, new()
+        {
+            var builder = ConnectionBuilder.Create<TParentType, TGraphType>();
+            _fields.Add(builder.FieldType);
+            return builder;
+        }
+
+        public FieldType Field<TType>(
             string name, 
             string description = null, 
             QueryArguments arguments = null,
@@ -34,17 +51,27 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException("name", "A field with that name is already registered.");
             }
 
-            _fields.Add(new FieldType
+            var fieldType = new FieldType
             {
                 Name = name,
+                Description = description,
                 Type = typeof(TType),
                 Arguments = arguments,
-                Resolve = resolve
-            });
+                Resolve = resolve,
+            };
+
+            _fields.Add(fieldType);
+
+            return fieldType;
         }
 
         public virtual string CollectTypes(TypeCollectionContext context)
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                Name = GetType().Name;
+            }
+
             return Name;
         }
     }
@@ -56,13 +83,13 @@ namespace GraphQL.Types
     {
         public TypeCollectionContext(
             Func<Type, GraphType> resolver,
-            Action<string, GraphType> addType)
+            Action<string, GraphType, TypeCollectionContext> addType)
         {
             ResolveType = resolver;
             AddType = addType;
         }
 
         public Func<Type, GraphType> ResolveType { get; private set; }
-        public Action<string, GraphType> AddType { get; private set; }
+        public Action<string, GraphType, TypeCollectionContext> AddType { get; private set; }
     }
 }

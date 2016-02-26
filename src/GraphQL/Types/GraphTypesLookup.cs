@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using GraphQL.Introspection;
 
 namespace GraphQL.Types
@@ -39,12 +40,8 @@ namespace GraphQL.Types
         {
             get
             {
-                GraphType result = null;
-                if (_types.ContainsKey(typeName))
-                {
-                    result = _types[typeName];
-                }
-
+                GraphType result;
+                _types.TryGetValue(typeName, out result);
                 return result;
             }
             set { _types[typeName] = value; }
@@ -75,9 +72,13 @@ namespace GraphQL.Types
         {
             var context = new TypeCollectionContext(
                 type => (GraphType) Activator.CreateInstance(type),
-                (name, type) =>
+                (name, type, _) =>
                 {
                     _types[name] = type;
+                    if (_ != null)
+                    {
+                        _.AddType(name, type, null);
+                    }
                 });
 
             AddType<TType>(context);
@@ -102,10 +103,14 @@ namespace GraphQL.Types
 
             type.Fields.Apply(field =>
             {
-                var foundType = this[field.Type];
-                if (foundType == null)
+                AddTypeIfNotRegistered(field.Type, context);
+
+                if (field.Arguments != null)
                 {
-                    AddType(context.ResolveType(field.Type), context);
+                    field.Arguments.Apply(arg =>
+                    {
+                        AddTypeIfNotRegistered(arg.Type, context);
+                    });
                 }
             });
 
@@ -114,12 +119,17 @@ namespace GraphQL.Types
                 var obj = (ObjectGraphType) type;
                 obj.Interfaces.Apply(objectInterface =>
                 {
-                    var foundType = this[objectInterface];
-                    if (foundType == null)
-                    {
-                        AddType(context.ResolveType(objectInterface), context);
-                    }
+                    AddTypeIfNotRegistered(objectInterface, context);
                 });
+            }
+        }
+
+        private void AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
+        {
+            var foundType = this[type];
+            if (foundType == null)
+            {
+                AddType(context.ResolveType(type), context);
             }
         }
     }

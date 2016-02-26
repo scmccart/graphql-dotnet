@@ -1,5 +1,6 @@
 ﻿using GraphQL.Language;
 using GraphQL.Types;
+using System.Threading;
 
 namespace GraphQL.Execution
 {
@@ -11,9 +12,9 @@ namespace GraphQL.Execution
             Errors = new ExecutionErrors();
         }
 
-        public Schema Schema { get; set; }
+        public ISchema Schema { get; set; }
 
-        public object RootObject { get; set; }
+        public object RootValue { get; set; }
 
         public Operation Operation { get; set; }
 
@@ -22,5 +23,7 @@ namespace GraphQL.Execution
         public Variables Variables { get; set; }
 
         public ExecutionErrors Errors { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

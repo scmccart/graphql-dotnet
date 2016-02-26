@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fixie, Version=1.0.0.15, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Fixie.1.0.0.15\lib\net45\Fixie.dll</HintPath>
+    <Reference Include="Fixie, Version=1.0.0.33, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Fixie.1.0.0.33\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -52,7 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\Cancellation\CancellationTests.cs" />
     <Compile Include="Execution\Directives\DirectivesTests.cs" />
+    <Compile Include="Execution\InputConversionTests.cs" />
+    <Compile Include="Execution\MutationTests.cs" />
+    <Compile Include="Execution\VariablesTests.cs" />
+    <Compile Include="SimpleContainer.cs" />
     <Compile Include="StarWars\EpisodeEnum.cs" />
     <Compile Include="StarWars\StarWarsIntrospectionTests.cs" />
     <Compile Include="StarWars\CharacterInterface.cs" />
@@ -67,10 +72,13 @@
     <Compile Include="StarWars\StarWarsQuery.cs" />
     <Compile Include="QueryTestBase.cs" />
     <Compile Include="StarWars\StarWarsSchema.cs" />
+    <Compile Include="StarWars\StarWarsTestBase.cs" />
     <Compile Include="TestAttribute.cs" />
     <Compile Include="Expect.cs" />
+    <Compile Include="Types\DateGraphTypeTests.cs" />
     <Compile Include="Types\BooleanGraphTypeTests.cs" />
     <Compile Include="Types\FieldRegistrationTests.cs" />
+    <Compile Include="Types\NonNullGraphTypeTests.cs" />
     <Compile Include="Types\SchemaTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +92,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Introspection\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
